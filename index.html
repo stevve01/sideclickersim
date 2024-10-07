@@ -1,12 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <base href="https://websimcreationengine.com/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Slide Button Clicker Game</title>
     <style>
-        /* Mobile-friendly styles and animations */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        @keyframes moveBg {
+            from { background-position: 0 0, 30px 30px; }
+            to { background-position: 60px 60px, 90px 90px; }
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             display: flex;
@@ -15,29 +20,57 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            background-image: linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3),
+                              linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            animation: moveBg 2s linear infinite;
             overflow-x: hidden;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .switch {
+                width: 200px;
+                height: 100px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
         }
 
         .game-content {
             text-align: center;
             padding: 2rem;
-            max-width: 100%;
+            max-width: 800px;
             width: 100%;
             position: relative;
             z-index: 1;
         }
 
-        h1 {
-            font-size: 2.2rem;
+        h1, h2 {
+            color: #333;
             margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 1.8rem; }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 250px;
-            height: 120px;
-            margin: 20px 0;
+            width: 300px;
+            height: 162px;
+            margin: 40px 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
         .slider {
@@ -48,166 +81,216 @@
             right: 0;
             bottom: 0;
             background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 60px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: .4s;
+            border-radius: 81px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 100px;
-            width: 100px;
-            left: 10px;
-            bottom: 10px;
+            height: 138px;
+            width: 138px;
+            left: 12px;
+            bottom: 12px;
             background-color: white;
-            transition: 0.4s;
+            transition: .4s;
             border-radius: 50%;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
         }
 
-        input:checked + .slider { background-color: #2196F3; }
-        input:checked + .slider:before { transform: translateX(120px); }
-
-        button {
-            background-color: #ffffff;
-            border: 1px solid #4CAF50;
-            color: #4CAF50;
-            padding: 12px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+        input:checked + .slider {
+            background-color: #2196F3;
         }
 
-        button:hover {
-            background-color: #4CAF50;
-            color: white;
-            transform: translateY(-2px);
+        input:checked + .slider:before {
+            transform: translateX(138px);
+        }
+
+        #score, #pointsPerSecond, #rebirthCount {
+            font-size: 1.8rem;
+            margin: 1rem 0;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .sidebar {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
             height: 100%;
+            width: 300px;
             background-color: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-left {
+            left: 0;
             transform: translateX(-100%);
-            transition: transform 0.3s ease;
+        }
+
+        .sidebar-right {
+            right: 0;
+            transform: translateX(100%);
         }
 
         .sidebar.active {
             transform: translateX(0);
         }
 
-        @media only screen and (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
-            }
+        button {
+            background-color: #ffffff;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 2px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-            .switch {
-                width: 200px;
-                height: 90px;
-            }
+        button:hover,
+        button:active {
+            background-color: #4CAF50;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
 
-            .slider:before {
-                height: 80px;
-                width: 80px;
-                left: 5px;
-                bottom: 5px;
-            }
+        button:disabled {
+            background-color: #cccccc;
+            border-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-            button {
-                width: 100%;
-            }
+        .toggle-buttons {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
 
-            .sidebar {
-                width: 100%;
-                padding: 10px;
-            }
+        .toggle-button {
+            background-color: #ffffff;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-button:hover,
+        .toggle-button:active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #settings {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: none;
+        }
+
+        #settings.active {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="game-content">
-        <h1>Slide Simulator</h1>
-        <p>Toggle the switch to earn points!</p>
-        <label class="switch">
-            <input type="checkbox" id="toggleSwitch">
-            <span class="slider"></span>
-        </label>
-        <div id="score">Points: 0.0</div>
-        <div id="pointsPerSecond">Points per second: 0.0</div>
-        <button id="rebirthButton">REBIRTH (1,000,000 points)</button>
-        <button id="openUpgrades">Upgrades</button>
-        <button id="openItems">Special Items</button>
-        <button id="openAchievements">Achievements</button>
-    </div>
+<div class="game-content">
+    <h1>Slide Simulator</h1>
+    <p>Toggle the switch to earn points!</p>
+    <label class="switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="slider" id="sliderSpan"></span>
+    </label>
+    <div id="score">Points: 0.0</div>
+    <div id="pointsPerSecond">Points per second: 0.0</div>
+    <div id="rebirthCount">Rebirths: 0</div>
+    <button id="rebirthButton">REBIRTH (1,000,000 points)</button>
+</div>
 
-    <!-- Sidebar for Upgrades -->
-    <div class="sidebar" id="upgradesMenu">
-        <h2>Upgrades</h2>
-        <div class="menu-item">Auto Clicker: <button id="buyAutoClicker">Buy</button></div>
-        <div class="menu-item">Point Multiplier: <button id="buyMultiplier">Buy</button></div>
-        <!-- More upgrades here -->
-    </div>
+<div class="toggle-buttons">
+    <button class="toggle-button" id="toggleUpgrades">Upgrades</button>
+    <button class="toggle-button" id="toggleItems">Special Items</button>
+    <button class="toggle-button" id="toggleAchievements">Achievements</button>
+    <button class="toggle-button" id="toggleSettings">Settings</button>
+</div>
 
-    <div class="sidebar" id="itemsMenu">
-        <h2>Special Items</h2>
-        <div class="menu-item">Lucky Charm: <button id="buyLuckyCharm">Buy</button></div>
-        <!-- More items here -->
-    </div>
+<div class="sidebar sidebar-left" id="upgradesMenu">
+    <h2>Upgrades</h2>
+    <!-- Your Upgrade Menu Content Here -->
+</div>
 
-    <div class="sidebar" id="achievementsMenu">
-        <h2>Achievements</h2>
-        <div class="menu-item">Score 100 Points</div>
-        <!-- More achievements here -->
-    </div>
+<div class="sidebar sidebar-right" id="achievementsMenu">
+    <h2>Achievements</h2>
+    <!-- Your Achievements Menu Content Here -->
+</div>
 
-    <script>
-        const toggleSwitch = document.getElementById('toggleSwitch');
-        const scoreDisplay = document.getElementById('score');
-        const pointsPerSecondDisplay = document.getElementById('pointsPerSecond');
-        let score = 0;
-        let pointsPerSecond = 0;
+<div id="settings">
+    <h2>Settings</h2>
+    <!-- Your Settings Menu Content Here -->
+</div>
 
-        toggleSwitch.addEventListener('change', function() {
-            score += 1;
-            scoreDisplay.textContent = `Points: ${score.toFixed(1)}`;
-        });
+<script>
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    const sliderSpan = document.getElementById('sliderSpan');
+    const scoreDisplay = document.getElementById('score');
+    const pointsPerSecondDisplay = document.getElementById('pointsPerSecond');
+    const rebirthCountDisplay = document.getElementById('rebirthCount');
 
-        setInterval(function() {
-            score += pointsPerSecond / 10;
-            scoreDisplay.textContent = `Points: ${score.toFixed(1)}`;
-            pointsPerSecondDisplay.textContent = `Points per second: ${pointsPerSecond.toFixed(1)}`;
-        }, 100);
+    let gameState = {
+        score: 0,
+        pointsPerClick: 1,
+        pointsPerSecond: 0,
+        rebirthCount: 0,
+    };
 
-        document.getElementById('rebirthButton').addEventListener('click', function() {
-            if (score >= 1000000) {
-                score = 0;
-                scoreDisplay.textContent = `Points: 0.0`;
-            }
-        });
+    function updateScore() {
+        scoreDisplay.textContent = `Points: ${gameState.score.toFixed(1)}`;
+        pointsPerSecondDisplay.textContent = `Points per second: ${gameState.pointsPerSecond.toFixed(1)}`;
+        rebirthCountDisplay.textContent = `Rebirths: ${gameState.rebirthCount}`;
+    }
 
-        document.getElementById('openUpgrades').addEventListener('click', function() {
-            document.getElementById('upgradesMenu').classList.add('active');
-        });
+    toggleSwitch.addEventListener('change', function () {
+        gameState.score += gameState.pointsPerClick;
+        updateScore();
+        sliderSpan.classList.add('shake');
+        setTimeout(() => sliderSpan.classList.remove('shake'), 500);
+    });
 
-        document.getElementById('openItems').addEventListener('click', function() {
-            document.getElementById('itemsMenu').classList.add('active');
-        });
-
-        document.getElementById('openAchievements').addEventListener('click', function() {
-            document.getElementById('achievementsMenu').classList.add('active');
-        });
-    </script>
+    setInterval(function () {
+        gameState.score += gameState.pointsPerSecond / 10;
+        updateScore();
+    }, 100);
+</script>
 </body>
 </html>
+
 
 
 
