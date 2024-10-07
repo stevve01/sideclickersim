@@ -6,6 +6,7 @@
     <title>Ultimate Slide Button Clicker Game</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
         body {
             font-family: 'Roboto', sans-serif;
             display: flex;
@@ -141,30 +142,91 @@
             <span class="slider"></span>
         </label>
         <div id="score">Points: 0.0</div>
+        <div id="pointsPerSecond">Points per second: 0.0</div>
+        <div id="rebirthCount">Rebirths: 0</div>
         <button id="rebirthButton">REBIRTH (1,000,000 points)</button>
     </div>
 
     <div class="sidebar" id="menu">
-        <!-- Sidebar content like upgrades, achievements, etc. -->
+        <h2>Upgrades</h2>
+        <button id="buyAutoClicker">Buy Auto Clicker</button>
+        <button id="buyMultiplier">Buy Point Multiplier</button>
+        <!-- Other upgrade buttons can go here -->
+
+        <h2>Special Items</h2>
+        <button id="buyLuckyCharm">Buy Lucky Charm</button>
+        <!-- Other special items -->
+
+        <h2>Achievements</h2>
+        <div id="achievement1">Beginner: Reach 100 points</div>
+        <div id="achievement2">Enthusiast: Reach 1,000 points</div>
+        <!-- More achievements -->
     </div>
 
     <script>
         const toggleSwitch = document.getElementById('toggleSwitch');
         const scoreDisplay = document.getElementById('score');
-        let score = 0;
+        const pointsPerSecondDisplay = document.getElementById('pointsPerSecond');
+        const rebirthCountDisplay = document.getElementById('rebirthCount');
+        const buyAutoClickerButton = document.getElementById('buyAutoClicker');
+        const buyMultiplierButton = document.getElementById('buyMultiplier');
+
+        let gameState = {
+            score: 0,
+            pointsPerClick: 1,
+            pointsPerSecond: 0,
+            autoClickers: 0,
+            pointMultiplier: 1,
+            rebirthCount: 0,
+            rebirthMultiplier: 1
+        };
+
+        function updateScore() {
+            scoreDisplay.textContent = `Points: ${gameState.score.toFixed(1)}`;
+            pointsPerSecondDisplay.textContent = `Points per second: ${gameState.pointsPerSecond.toFixed(1)}`;
+            rebirthCountDisplay.textContent = `Rebirths: ${gameState.rebirthCount}`;
+        }
+
+        function incrementScore(amount) {
+            gameState.score += amount * gameState.pointMultiplier * gameState.rebirthMultiplier;
+            updateScore();
+        }
 
         toggleSwitch.addEventListener('change', function() {
-            score += 1;
-            scoreDisplay.textContent = `Points: ${score.toFixed(1)}`;
+            incrementScore(gameState.pointsPerClick);
         });
 
+        buyAutoClickerButton.addEventListener('click', function() {
+            if (gameState.score >= 10) {
+                gameState.autoClickers++;
+                gameState.pointsPerSecond += 1;
+                gameState.score -= 10;
+                updateScore();
+            }
+        });
+
+        buyMultiplierButton.addEventListener('click', function() {
+            if (gameState.score >= 50) {
+                gameState.pointMultiplier *= 1.5;
+                gameState.score -= 50;
+                updateScore();
+            }
+        });
+
+        setInterval(function() {
+            incrementScore(gameState.pointsPerSecond / 10);
+        }, 100);
+
         document.getElementById('rebirthButton').addEventListener('click', function() {
-            if (score >= 1000000) {
-                score = 0;
-                scoreDisplay.textContent = `Points: 0.0`;
+            if (gameState.score >= 1000000) {
+                gameState.rebirthCount++;
+                gameState.rebirthMultiplier = 1 + gameState.rebirthCount * 0.1;
+                gameState.score = 0;
+                updateScore();
             }
         });
     </script>
 </body>
 </html>
+
 
