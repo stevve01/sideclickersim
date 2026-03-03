@@ -1,3 +1,4 @@
+--- index.html (原始)
 <html>
 <head>
     <base href="https://websimcreationengine.com/">
@@ -291,6 +292,969 @@
 </body>
 </html>
 
++++ index.html (修改后)
+<html>
+<head>
+    <base href="https://websimcreationengine.com/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Slide Button Clicker Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
+        @keyframes moveBg {
+            from { background-position: 0 0, 30px 30px; }
+            to { background-position: 60px 60px, 90px 90px; }
+        }
 
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            background-image: linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3),
+                              linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            animation: moveBg 2s linear infinite;
+            overflow-x: hidden;
+        }
 
+        @media only screen and (max-width: 600px) {
+            .switch {
+                width: 200px;
+                height: 100px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .game-content {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 1.8rem; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 300px;
+            height: 162px;
+            margin: 40px 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 81px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 138px;
+            width: 138px;
+            left: 12px;
+            bottom: 12px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(138px);
+        }
+
+        #score, #pointsPerSecond, #rebirthCount {
+            font-size: 1.8rem;
+            margin: 1rem 0;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            height: 100%;
+            width: 300px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-left {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        .sidebar-right {
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        button {
+            background-color: #ffffff;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 2px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        button:hover,
+        button:active {
+            background-color: #4CAF50;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            border-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .upgrade-item, .achievement-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+        }
+
+        .upgrade-item:hover, .achievement-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .toggle-buttons {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .toggle-button {
+            background-color: #ffffff;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-button:hover,
+        .toggle-button:active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #settings {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: none;
+        }
+
+        #settings.active {
+            display: block;
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="game-content">
+    <h1>Slide Simulator</h1>
+    <p>Toggle the switch to earn points!</p>
+    <label class="switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="slider" id="sliderSpan"></span>
+    </label>
+    <div id="score">Points: 0.0</div>
+    <div id="pointsPerSecond">Points per second: 0.0</div>
+    <div id="rebirthCount">Rebirths: 0</div>
+    <button id="rebirthButton">REBIRTH (1,000,000 points)</button>
+</div>
+
+<div class="toggle-buttons">
+    <button class="toggle-button" id="toggleUpgrades">Upgrades</button>
+    <button class="toggle-button" id="toggleItems">Special Items</button>
+    <button class="toggle-button" id="toggleAchievements">Achievements</button>
+    <button class="toggle-button" id="toggleSettings">Settings</button>
+</div>
+
+<div class="sidebar sidebar-left" id="upgradesMenu">
+    <h2>Upgrades</h2>
+    <div id="upgradesContainer">
+        <!-- Upgrades will be dynamically added here -->
+    </div>
+</div>
+
+<div class="sidebar sidebar-right" id="achievementsMenu">
+    <h2>Achievements</h2>
+    <div id="achievementsContainer">
+        <!-- Achievements will be dynamically added here -->
+    </div>
+</div>
+
+<div class="sidebar sidebar-right" id="itemsMenu">
+    <h2>Special Items</h2>
+    <div id="itemsContainer">
+        <!-- Special items will be dynamically added here -->
+    </div>
+</div>
+
+<div id="notification" class="notification">Notification text</div>
+
+<div id="settings">
+    <h2>Settings</h2>
+    <div>
+        <label>
+            <input type="checkbox" id="soundEnabled" checked> Enable Sound Effects
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" id="notificationsEnabled" checked> Enable Notifications
+        </label>
+    </div>
+    <div>
+        <button onclick="saveGame()">Save Game</button>
+        <button onclick="loadGame()">Load Game</button>
+        <button onclick="resetGame()">Reset Game</button>
+    </div>
+</div>
+
+<script>
+    // Game state
+    const gameState = {
+        score: 0,
+        pointsPerClick: 1,
+        pointsPerSecond: 0,
+        rebirthCount: 0,
+        upgrades: [],
+        achievements: [],
+        specialItems: [],
+        purchasedUpgrades: {},
+        unlockedAchievements: {},
+        ownedItems: {}
+    };
+
+    // DOM Elements
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    const sliderSpan = document.getElementById('sliderSpan');
+    const scoreDisplay = document.getElementById('score');
+    const pointsPerSecondDisplay = document.getElementById('pointsPerSecond');
+    const rebirthCountDisplay = document.getElementById('rebirthCount');
+    const rebirthButton = document.getElementById('rebirthButton');
+
+    // Sidebar elements
+    const toggleUpgrades = document.getElementById('toggleUpgrades');
+    const toggleItems = document.getElementById('toggleItems');
+    const toggleAchievements = document.getElementById('toggleAchievements');
+    const toggleSettings = document.getElementById('toggleSettings');
+
+    const upgradesMenu = document.getElementById('upgradesMenu');
+    const itemsMenu = document.getElementById('itemsMenu');
+    const achievementsMenu = document.getElementById('achievementsMenu');
+    const settingsMenu = document.getElementById('settings');
+
+    // Settings elements
+    const soundEnabledCheckbox = document.getElementById('soundEnabled');
+    const notificationsEnabledCheckbox = document.getElementById('notificationsEnabled');
+
+    // Sound effects
+    let clickSound, purchaseSound, achievementSound;
+
+    function initSounds() {
+        // Create simple Web Audio API sounds instead of requiring external files
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Create a simple click sound
+            clickSound = {
+                play: function() {
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.type = 'square';
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.value = 0.1;
+                    oscillator.start();
+                    setTimeout(() => {
+                        oscillator.stop();
+                    }, 50);
+                }
+            };
+
+            // Create a simple purchase sound
+            purchaseSound = {
+                play: function() {
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 523.25; // C5
+                    gainNode.gain.value = 0.1;
+                    oscillator.start();
+                    setTimeout(() => {
+                        oscillator.stop();
+                    }, 100);
+                }
+            };
+
+            // Create a simple achievement sound
+            achievementSound = {
+                play: function() {
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.value = 659.25; // E5
+                    gainNode.gain.value = 0.1;
+                    oscillator.start();
+                    setTimeout(() => {
+                        oscillator.stop();
+                    }, 200);
+                }
+            };
+        } catch(e) {
+            // Fallback if Web Audio API is not supported
+            console.log("Web Audio API not supported, using console for sound indicators");
+            clickSound = { play: () => console.log("Click sound played") };
+            purchaseSound = { play: () => console.log("Purchase sound played") };
+            achievementSound = { play: () => console.log("Achievement sound played") };
+        }
+    }
+
+    // Initialize game
+    function initGame() {
+        // Initialize sounds
+        initSounds();
+
+        // Create upgrade data
+        gameState.upgrades = [
+            { id: 'click1', name: 'Better Slides', description: 'Double points per click', cost: 10, type: 'click', multiplier: 2 },
+            { id: 'click2', name: 'Pro Sliding', description: 'Triple points per click', cost: 100, type: 'click', multiplier: 3 },
+            { id: 'pps1', name: 'Auto-Slider', description: 'Adds 1 point per second', cost: 50, type: 'pps', value: 1 },
+            { id: 'pps2', name: 'Dual Sliders', description: 'Adds 5 points per second', cost: 500, type: 'pps', value: 5 },
+            { id: 'pps3', name: 'Assembly Line', description: 'Adds 20 points per second', cost: 2000, type: 'pps', value: 20 }
+        ];
+
+        // Create achievement data
+        gameState.achievements = [
+            { id: 'first_click', name: 'First Slide', description: 'Make your first slide', condition: 'score', threshold: 1, reward: 10 },
+            { id: 'hundred_points', name: 'Century Club', description: 'Reach 100 points', condition: 'score', threshold: 100, reward: 50 },
+            { id: 'thousand_points', name: 'Thousand Points', description: 'Reach 1,000 points', condition: 'score', threshold: 1000, reward: 200 },
+            { id: 'first_rebirth', name: 'New Beginning', description: 'Complete your first rebirth', condition: 'rebirth', threshold: 1, reward: 500 }
+        ];
+
+        // Create special items data
+        gameState.specialItems = [
+            { id: 'golden_switch', name: 'Golden Switch', description: 'Doubles all earnings', cost: 10000, effect: 'multiplier', value: 2 },
+            { id: 'diamond_switch', name: 'Diamond Switch', description: 'Triples all earnings', cost: 100000, effect: 'multiplier', value: 3 }
+        ];
+
+        // Load game from localStorage if available
+        loadGame();
+
+        // Update UI
+        updateUI();
+
+        // Set up event listeners
+        setupEventListeners();
+
+        // Start game loop
+        startGameLoop();
+    }
+
+    function setupEventListeners() {
+        // Toggle switch
+        toggleSwitch.addEventListener('change', function () {
+            gameState.score += gameState.pointsPerClick;
+            updateScore();
+
+            // Add visual feedback
+            sliderSpan.classList.add('shake');
+            setTimeout(() => sliderSpan.classList.remove('shake'), 500);
+
+            // Play click sound
+            if (soundEnabledCheckbox.checked) {
+                playSound(clickSound);
+            }
+
+            // Check for achievements
+            checkAchievements();
+        });
+
+        // Rebirth button
+        rebirthButton.addEventListener('click', handleRebirth);
+
+        // Sidebar toggles
+        toggleUpgrades.addEventListener('click', () => toggleSidebar(upgradesMenu));
+        toggleItems.addEventListener('click', () => toggleSidebar(itemsMenu));
+        toggleAchievements.addEventListener('click', () => toggleSidebar(achievementsMenu));
+        toggleSettings.addEventListener('click', () => toggleSidebar(settingsMenu));
+
+        // Settings checkboxes
+        soundEnabledCheckbox.addEventListener('change', saveSettings);
+        notificationsEnabledCheckbox.addEventListener('change', saveSettings);
+
+        // Generate upgrade HTML
+        generateUpgradeHTML();
+        generateAchievementHTML();
+        generateItemHTML();
+
+        // Load settings
+        loadSettings();
+    }
+
+    function startGameLoop() {
+        // Main game loop - runs 10 times per second
+        setInterval(function () {
+            // Add points per second
+            gameState.score += gameState.pointsPerSecond / 10;
+
+            // Update UI
+            updateScore();
+
+            // Check for achievements
+            checkAchievements();
+        }, 100);
+    }
+
+    function updateScore() {
+        scoreDisplay.textContent = `Points: ${formatNumber(gameState.score)}`;
+        pointsPerSecondDisplay.textContent = `Points per second: ${formatNumber(gameState.pointsPerSecond)}`;
+        rebirthCountDisplay.textContent = `Rebirths: ${gameState.rebirthCount}`;
+    }
+
+    function updateUI() {
+        updateScore();
+
+        // Update rebirth button
+        const rebirthCost = Math.pow(10, gameState.rebirthCount + 6); // 1M, 10M, 100M, etc.
+        rebirthButton.textContent = `REBIRTH (${formatNumber(rebirthCost)} points)`;
+        rebirthButton.disabled = gameState.score < rebirthCost;
+
+        // Update upgrades
+        updateUpgradesUI();
+
+        // Update achievements
+        updateAchievementsUI();
+
+        // Update items
+        updateItemsUI();
+    }
+
+    function formatNumber(num) {
+        if (num >= 1e12) {
+            return (num / 1e12).toFixed(2) + 'T';
+        } else if (num >= 1e9) {
+            return (num / 1e9).toFixed(2) + 'B';
+        } else if (num >= 1e6) {
+            return (num / 1e6).toFixed(2) + 'M';
+        } else if (num >= 1e3) {
+            return (num / 1e3).toFixed(2) + 'K';
+        } else {
+            return num.toFixed(1);
+        }
+    }
+
+    function handleRebirth() {
+        const rebirthCost = Math.pow(10, gameState.rebirthCount + 6);
+        if (gameState.score >= rebirthCost) {
+            // Reset progress but keep rebirth count
+            gameState.rebirthCount++;
+            gameState.score = 0;
+            gameState.pointsPerSecond = 0;
+
+            // Apply rebirth bonus (extra points per click and per second per rebirth)
+            gameState.pointsPerClick = 1 + gameState.rebirthCount * 0.5;
+
+            // Update UI
+            updateUI();
+
+            // Show notification
+            showNotification(`Rebirth #${gameState.rebirthCount} completed!`);
+        }
+    }
+
+    function generateUpgradeHTML() {
+        const container = document.getElementById('upgradesContainer');
+        container.innerHTML = '';
+
+        gameState.upgrades.forEach(upgrade => {
+            const purchased = gameState.purchasedUpgrades[upgrade.id] || 0;
+            const cost = calculateUpgradeCost(upgrade.cost, purchased);
+
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = `
+                <h3>${upgrade.name}</h3>
+                <p>${upgrade.description}</p>
+                <p>Cost: ${formatNumber(cost)} points</p>
+                <p>Owned: ${purchased}</p>
+                <button onclick="purchaseUpgrade('${upgrade.id}')"
+                        ${gameState.score < cost ? 'disabled' : ''}>
+                    Buy
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function calculateUpgradeCost(baseCost, purchased) {
+        // Cost increases with each purchase
+        return baseCost * Math.pow(1.5, purchased);
+    }
+
+    function purchaseUpgrade(id) {
+        const upgrade = gameState.upgrades.find(u => u.id === id);
+        if (!upgrade) return;
+
+        const purchased = gameState.purchasedUpgrades[id] || 0;
+        const cost = calculateUpgradeCost(upgrade.cost, purchased);
+
+        if (gameState.score >= cost) {
+            gameState.score -= cost;
+            gameState.purchasedUpgrades[id] = purchased + 1;
+
+            // Apply upgrade effect
+            if (upgrade.type === 'click') {
+                gameState.pointsPerClick *= upgrade.multiplier;
+            } else if (upgrade.type === 'pps') {
+                gameState.pointsPerSecond += upgrade.value;
+            }
+
+            // Play purchase sound
+            playSound(purchaseSound);
+
+            // Show notification
+            showNotification(`${upgrade.name} purchased!`);
+
+            // Update UI
+            updateUI();
+            generateUpgradeHTML();
+        }
+    }
+
+    function generateAchievementHTML() {
+        const container = document.getElementById('achievementsContainer');
+        container.innerHTML = '';
+
+        gameState.achievements.forEach(achievement => {
+            const unlocked = gameState.unlockedAchievements[achievement.id] || false;
+
+            const div = document.createElement('div');
+            div.className = 'achievement-item';
+            div.innerHTML = `
+                <h3>${unlocked ? '✓ ' : '□ '}${achievement.name}</h3>
+                <p>${achievement.description}</p>
+                <p>Reward: ${formatNumber(achievement.reward)} points</p>
+                <p>Status: ${unlocked ? 'Unlocked' : 'Locked'}</p>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function checkAchievements() {
+        gameState.achievements.forEach(achievement => {
+            if (gameState.unlockedAchievements[achievement.id]) return; // Already unlocked
+
+            let unlocked = false;
+
+            if (achievement.condition === 'score' && gameState.score >= achievement.threshold) {
+                unlocked = true;
+            } else if (achievement.condition === 'rebirth' && gameState.rebirthCount >= achievement.threshold) {
+                unlocked = true;
+            }
+
+            if (unlocked) {
+                gameState.unlockedAchievements[achievement.id] = true;
+
+                // Give reward
+                gameState.score += achievement.reward;
+
+                // Play achievement sound
+                playSound(achievementSound);
+
+                // Show notification
+                showNotification(`Achievement Unlocked: ${achievement.name}! +${formatNumber(achievement.reward)} points`);
+
+                // Update UI
+                generateAchievementHTML();
+                updateScore();
+            }
+        });
+    }
+
+    function generateItemHTML() {
+        const container = document.getElementById('itemsContainer');
+        container.innerHTML = '';
+
+        gameState.specialItems.forEach(item => {
+            const owned = gameState.ownedItems[item.id] || 0;
+
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = `
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+                <p>Cost: ${formatNumber(item.cost)} points</p>
+                <p>Owned: ${owned}</p>
+                <button onclick="purchaseItem('${item.id}')"
+                        ${gameState.score < item.cost ? 'disabled' : ''}>
+                    Buy
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function purchaseItem(id) {
+        const item = gameState.specialItems.find(i => i.id === id);
+        if (!item) return;
+
+        if (gameState.score >= item.cost) {
+            gameState.score -= item.cost;
+            gameState.ownedItems[id] = (gameState.ownedItems[id] || 0) + 1;
+
+            // Apply item effect
+            if (item.effect === 'multiplier') {
+                gameState.pointsPerClick *= item.value;
+                gameState.pointsPerSecond *= item.value;
+            }
+
+            // Play purchase sound
+            playSound(purchaseSound);
+
+            // Show notification
+            showNotification(`${item.name} purchased!`);
+
+            // Update UI
+            updateUI();
+            generateItemHTML();
+        }
+    }
+
+    function updateUpgradesUI() {
+        gameState.upgrades.forEach(upgrade => {
+            const purchased = gameState.purchasedUpgrades[upgrade.id] || 0;
+            const cost = calculateUpgradeCost(upgrade.cost, purchased);
+
+            // Find the button for this upgrade and update its disabled state
+            const buttons = document.querySelectorAll(`[onclick*="purchaseUpgrade('${upgrade.id}')"]`);
+            buttons.forEach(button => {
+                button.disabled = gameState.score < cost;
+            });
+        });
+    }
+
+    function updateAchievementsUI() {
+        // Just regenerate the HTML since we don't need to preserve state
+        generateAchievementHTML();
+    }
+
+    function updateItemsUI() {
+        gameState.specialItems.forEach(item => {
+            // Find the button for this item and update its disabled state
+            const buttons = document.querySelectorAll(`[onclick*="purchaseItem('${item.id}')"]`);
+            buttons.forEach(button => {
+                button.disabled = gameState.score < item.cost;
+            });
+        });
+    }
+
+    function toggleSidebar(sidebar) {
+        // Close other sidebars
+        [upgradesMenu, itemsMenu, achievementsMenu, settingsMenu].forEach(menu => {
+            if (menu !== sidebar) menu.classList.remove('active');
+        });
+
+        // Toggle clicked sidebar
+        sidebar.classList.toggle('active');
+    }
+
+    function showNotification(text) {
+        const notification = document.getElementById('notification');
+        notification.textContent = text;
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    function playSound(sound) {
+        // Play the sound if it exists and sound is enabled
+        if (soundEnabledCheckbox.checked) {
+            try {
+                if (sound && typeof sound.play === 'function') {
+                    sound.play();
+                }
+            } catch(e) {
+                // Handle cases where audio isn't supported
+                console.log("Error playing sound:", e);
+            }
+        }
+    }
+
+    function showNotification(text) {
+        if (notificationsEnabledCheckbox.checked) {
+            const notification = document.getElementById('notification');
+            notification.textContent = text;
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    function saveSettings() {
+        const settings = {
+            soundEnabled: soundEnabledCheckbox.checked,
+            notificationsEnabled: notificationsEnabledCheckbox.checked
+        };
+
+        localStorage.setItem('slideSimulatorSettings', JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+        try {
+            const settingsData = localStorage.getItem('slideSimulatorSettings');
+            if (settingsData) {
+                const settings = JSON.parse(settingsData);
+
+                soundEnabledCheckbox.checked = settings.soundEnabled !== undefined ? settings.soundEnabled : true;
+                notificationsEnabledCheckbox.checked = settings.notificationsEnabled !== undefined ? settings.notificationsEnabled : true;
+            } else {
+                // Default settings
+                soundEnabledCheckbox.checked = true;
+                notificationsEnabledCheckbox.checked = true;
+            }
+        } catch(e) {
+            console.error('Error loading settings:', e);
+            // Default settings
+            soundEnabledCheckbox.checked = true;
+            notificationsEnabledCheckbox.checked = true;
+        }
+    }
+
+    function resetGame() {
+        if (confirm('Are you sure you want to reset your game? All progress will be lost.')) {
+            // Reset all game state
+            gameState.score = 0;
+            gameState.pointsPerClick = 1;
+            gameState.pointsPerSecond = 0;
+            gameState.rebirthCount = 0;
+            gameState.purchasedUpgrades = {};
+            gameState.unlockedAchievements = {};
+            gameState.ownedItems = {};
+
+            // Update UI
+            updateUI();
+            generateUpgradeHTML();
+            generateAchievementHTML();
+            generateItemHTML();
+
+            showNotification('Game has been reset!');
+        }
+    }
+
+    function saveGame() {
+        try {
+            const saveData = {
+                score: gameState.score,
+                pointsPerClick: gameState.pointsPerClick,
+                pointsPerSecond: gameState.pointsPerSecond,
+                rebirthCount: gameState.rebirthCount,
+                purchasedUpgrades: gameState.purchasedUpgrades,
+                unlockedAchievements: gameState.unlockedAchievements,
+                ownedItems: gameState.ownedItems,
+                lastPlayed: Date.now()
+            };
+
+            localStorage.setItem('slideSimulatorSave', JSON.stringify(saveData));
+            showNotification('Game saved!');
+        } catch(e) {
+            console.error('Error saving game:', e);
+        }
+    }
+
+    function loadGame() {
+        try {
+            const saveData = localStorage.getItem('slideSimulatorSave');
+            if (saveData) {
+                const data = JSON.parse(saveData);
+
+                gameState.score = data.score || 0;
+                gameState.pointsPerClick = data.pointsPerClick || 1;
+                gameState.pointsPerSecond = data.pointsPerSecond || 0;
+                gameState.rebirthCount = data.rebirthCount || 0;
+                gameState.purchasedUpgrades = data.purchasedUpgrades || {};
+                gameState.unlockedAchievements = data.unlockedAchievements || {};
+                gameState.ownedItems = data.ownedItems || {};
+
+                // Calculate points per second based on purchased upgrades
+                gameState.pointsPerSecond = 0;
+                Object.keys(gameState.purchasedUpgrades).forEach(upgradeId => {
+                    const count = gameState.purchasedUpgrades[upgradeId];
+                    const upgrade = gameState.upgrades.find(u => u.id === upgradeId);
+
+                    if (upgrade && upgrade.type === 'pps') {
+                        for (let i = 0; i < count; i++) {
+                            gameState.pointsPerSecond += upgrade.value * Math.pow(1.5, i);
+                        }
+                    }
+                });
+
+                // Apply item multipliers
+                Object.keys(gameState.ownedItems).forEach(itemId => {
+                    const count = gameState.ownedItems[itemId];
+                    const item = gameState.specialItems.find(i => i.id === itemId);
+
+                    if (item) {
+                        let multiplier = Math.pow(item.value, count);
+                        gameState.pointsPerClick *= multiplier;
+
+                        // For PPS, we need to recalculate the total
+                        gameState.pointsPerSecond *= multiplier;
+                    }
+                });
+
+                // Apply rebirth bonus
+                gameState.pointsPerClick = 1 + gameState.rebirthCount * 0.5;
+
+                showNotification('Game loaded!');
+            }
+        } catch(e) {
+            console.error('Error loading game:', e);
+        }
+    }
+
+    // Initialize the game when the page loads
+    window.onload = function() {
+        initGame();
+
+        // Set up auto-save
+        setInterval(saveGame, 30000); // Save every 30 seconds
+    };
+
+    // Expose functions to global scope for onclick handlers
+    window.purchaseUpgrade = purchaseUpgrade;
+    window.purchaseItem = purchaseItem;
+    window.toggleSidebar = toggleSidebar;
+    window.showNotification = showNotification;
+    window.saveGame = saveGame;
+    window.loadGame = loadGame;
+    window.resetGame = resetGame;
+    window.saveSettings = saveSettings;
+    window.loadSettings = loadSettings;
+</script>
+</body>
+</html>
